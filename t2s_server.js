@@ -30,7 +30,8 @@ app.get('/audio/:text', (req, res) => {
 	if (!text) {
 		res.status(400).send('Invalid Parameters.');
 	}
-	console.log(text);
+
+  console.log(text);
 
 	exec('./get_speech.sh ' + text,  {maxBuffer: MAX_BUFFER_SIZE}, (err, stdout, stderr) => {
 		if (err) { console.log(err); }
