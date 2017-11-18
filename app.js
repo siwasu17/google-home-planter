@@ -34,7 +34,6 @@ const LIGHT_THRESHOLD = 0.3;
 
 //夜の時間帯か判定
 const isNight = function(currentMoment){
-  logger.info(currentMoment);
   let nightStart = moment({hours: 20, minutes: 00});
   let nightEnd = moment({hours: 23, minutes: 30});
 
@@ -68,8 +67,9 @@ setInterval(function() {
     return;
   }
 
-  logger.info("起動開始");
+  logger.info("夜になりました。起動します");
   alreadyRunning = true;
+
   logger.info("FlowerPowerを探しています...");
 
   flower.discover((fp) => {
@@ -100,7 +100,7 @@ setInterval(function() {
 
           if(sunlight > LIGHT_THRESHOLD){
             if(myip){
-              let text = "おかえりなさい。今日もおつかれさまでした。";
+              let text = "おかえりなさい。今日も一日おつかれさまでした。";
               googlehome.play("http://" + myip + ":8080/audio/" + text, (notifyRes) => {
                 logger.info(notifyRes);
               });
