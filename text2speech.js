@@ -24,6 +24,7 @@ app.get("/audio/:text", (req, res) => {
   console.log("Received text:" + text);
 
   const MAX_BUFFER_SIZE = 2000*1024;
+
   exec("./get_speech.sh " + text,  {maxBuffer: MAX_BUFFER_SIZE}, (err, stdout, stderr) => {
     if (err) { console.log(err); return; }
     const file = fs.readFileSync(__dirname + "/audio/voice.wav", "binary");

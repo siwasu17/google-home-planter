@@ -7,6 +7,11 @@ googlehome.accent("ja");
 //Flower Powerモジュールの準備
 const flower = require("flower-power");
 
+//ロガー準備
+let log4js = require('log4js');
+let logger = log4js.getLogger();
+logger.level = 'info';
+
 //このマシンのIPアドレスを取得
 let myip;
 const os = require("os");
@@ -15,11 +20,6 @@ os.networkInterfaces()["en0"].forEach(function(nic){
     myip = nic["address"];
   }
 });
-
-//ロガー準備
-let log4js = require('log4js');
-let logger = log4js.getLogger();
-logger.level = 'debug';
 
 //時間取扱ライブラリ準備
 let moment = require("moment");
@@ -43,6 +43,40 @@ const isNight = function(currentMoment){
   return false;
 }
 
+//気温に応じたメッセージ
+const getTemperatureMessage = function(temperature){
+  let message = "今日は";
+  if(temperature < 15){
+    message += "とても寒い";
+  }else if(temperature < 20){
+    message += "はだ寒い";
+  }else if(temperature < 25){
+    message += "過ごしやすい";
+  }else{
+    message += "あつい";
+  }
+  return message + "一日だったね。";
+}
+
+//土の水分に応じたメッセージ
+const getMoistureMessage = function(moisture){
+  let message = "";
+  if(moisture < 20){
+    message += "そろそろお水が欲しいかも。";
+  }else if(moisture < 50){
+    message += "お水はちょうどよいかんじ。";
+  }else{
+    message += "ちょっと水が多すぎるかも。";
+  }
+  return message;
+}
+
+//GoogleHomeにしゃべってもらう
+const sayMessage = function(message){
+  googlehome.play("http://" + myip + ":8080/audio/" + message, (notifyRes) => {
+    logger.info(notifyRes);
+  });
+}
 
 //一定間隔毎に起動チェックして、条件を満たしたらセンサーを動かし始める
 const interval = 5000;
@@ -80,6 +114,8 @@ setInterval(function() {
       if(err) return;
 
       logger.info("接続しました");
+      //LED光らせる
+      fp.ledPulse((err) => { if(err)return; }); 
 
       fp.enableLiveMode((err) => {
         if(err)return;
@@ -99,20 +135,32 @@ setInterval(function() {
           }
 
           if(sunlight > LIGHT_THRESHOLD){
-            if(myip){
-              let text = "おかえりなさい。今日も一日おつかれさまでした。";
-              googlehome.play("http://" + myip + ":8080/audio/" + text, (notifyRes) => {
-                logger.info(notifyRes);
-              });
-              greatedDate[moment().format("YYYYMMDD")] = 1;
+            logger.info("帰宅を検知しました");
+            fp.ledPulse((err) => { if(err)return; }); 
 
-              //終了
-              logger.info("ライブモードを終了します");
-              fp.disableLiveMode((err) => {
-                fp.disconnect((err) => { return; });
-                return;
+            greatedDate[moment().format("YYYYMMDD")] = 1;
+
+            let text = "おかえりなさい。";
+
+            //温度チェック
+            fp.readAirTemperature((err, temperature) => {
+              if(err)return;
+              text += getTemperatureMessage(temperature);
+
+              //水分チェック
+              fp.readSoilMoisture((err, moisture) => {
+                text += getMoistureMessage(moisture);
+                //植木鉢の状態をもとにメッセージを構築してGoogleHomeからしゃべる
+                sayMessage(text);
               });
-            }
+            });
+
+            //終了
+            logger.info("ライブモードを終了します");
+            fp.disableLiveMode((err) => {
+              fp.disconnect((err) => { return; });
+              return;
+            });
           }
         });
       });
