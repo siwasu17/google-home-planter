@@ -8,8 +8,8 @@
         "sourceType": "module"
     },
     "rules": {
-				"no-var": 1,
-				"func-style": 1,
+      "no-var": 1,
+      "func-style": 1,
         "indent": [
             "error",
             2
