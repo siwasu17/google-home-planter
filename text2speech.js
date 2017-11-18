@@ -1,5 +1,5 @@
 /**
- * 音声発話APIを叩いて音声ファイルを返却するサーバー
+ * 音声合成APIを叩いて音声ファイルを返却するサーバー
  */
 const express = require('express');
 const bodyParser = require('body-parser');
