@@ -134,10 +134,16 @@ setInterval(function() {
             fp.disconnect((err) => { return; });
           }
 
+          if(current.format("YYYYMMDD") in greatedDate){
+            //音声再生中にもイベントが来てしまうので、多重動作対策
+            return;
+          }
+
           if(sunlight > LIGHT_THRESHOLD){
             logger.info("帰宅を検知しました");
             fp.ledPulse((err) => { if(err)return; }); 
 
+            //本日の音声再生シーケンスに入ったのでフラグを立てる
             greatedDate[moment().format("YYYYMMDD")] = 1;
 
             let text = "おかえりなさい。";
