@@ -79,7 +79,7 @@ const sayMessage = function(message){
 }
 
 //一定間隔毎に起動チェックして、条件を満たしたらセンサーを動かし始める
-const interval = 5000;
+const interval = 300000;
 setInterval(function() {
   logger.info("起動チェック中...");
   let current = moment();
