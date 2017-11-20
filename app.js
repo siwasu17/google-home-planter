@@ -82,7 +82,6 @@ const sayMessage = function(message){
 const interval = 300000;
 setInterval(function() {
   logger.info("起動チェック中...");
-	console.log(greatedDate);
 
   let current = moment();
   //夜でなければすぐ終了
