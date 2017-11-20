@@ -30,12 +30,12 @@ let greatedDate = {};
 //すでに動作中かどうか
 let alreadyRunning = false;
 //起動する明るさの閾値
-const LIGHT_THRESHOLD = 0.3;
+const LIGHT_THRESHOLD = 0.2;
 
 //夜の時間帯か判定
 const isNight = function(currentMoment){
   let nightStart = moment({hours: 20, minutes: 00});
-  let nightEnd = moment({hours: 23, minutes: 30});
+  let nightEnd = moment({hours: 23, minutes: 55});
 
   if(currentMoment.diff(nightStart) > 0 && currentMoment.diff(nightEnd) < 0){
     return true;
@@ -47,9 +47,9 @@ const isNight = function(currentMoment){
 const getTemperatureMessage = function(temperature){
   let message = "今日は";
   if(temperature < 15){
-    message += "とても寒い";
+    message += "とてもさむい";
   }else if(temperature < 20){
-    message += "はだ寒い";
+    message += "はだざむい";
   }else if(temperature < 25){
     message += "過ごしやすい";
   }else{
@@ -82,6 +82,8 @@ const sayMessage = function(message){
 const interval = 300000;
 setInterval(function() {
   logger.info("起動チェック中...");
+	console.log(greatedDate);
+
   let current = moment();
   //夜でなければすぐ終了
   if(!isNight(current) ){
@@ -167,6 +169,7 @@ setInterval(function() {
               fp.disconnect((err) => { return; });
               return;
             });
+						alreadyRunning = false;
           }
         });
       });
